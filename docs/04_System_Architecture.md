@@ -97,7 +97,7 @@ The application follows these architectural principles:
 - Single Responsibility Principle
 - Defense in Depth
 - Security by Default
-- Business Logic centralized in Services
+- Lightweight business logic in API routes; Service layer deferred for Version 1
 - Repository-only database access
 - Future-ready modular design
 - Simplicity over unnecessary complexity
@@ -117,10 +117,6 @@ FastAPI Routes
 
 ↓
 
-Service Layer
-
-↓
-
 Repository Layer
 
 ↓
@@ -132,7 +128,7 @@ Rules:
 
 - Every layer communicates only with the layer directly below it.
 - Routes never communicate directly with the database.
-- Business logic exists only in Services.
+- Lightweight business logic and validation remain in API routes for Version 1.
 - Repositories only perform data access.
 - Frontend never communicates directly with the database.
 
@@ -374,23 +370,11 @@ Validation
 
 ↓
 
-Service
-
-↓
-
 Repository
 
 ↓
 
 Database
-
-↓
-
-Repository
-
-↓
-
-Service
 
 ↓
 
@@ -405,8 +389,8 @@ Frontend
 
 ## Request Principles
 
-- Thin Routes
-- Business Logic in Services
+- Lightweight Routes
+- Lightweight Business Logic in API Routes
 - Repository Pattern
 - Validation before Business Logic
 - Standard API Responses

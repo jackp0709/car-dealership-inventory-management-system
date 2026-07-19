@@ -63,13 +63,9 @@ The goal is to establish a consistent development environment before implementat
 
 The backend follows a Hybrid Clean Architecture.
 
-Application Flow:
+Version 1 Application Flow:
 
 API
-
-↓
-
-Service
 
 ↓
 
@@ -83,7 +79,7 @@ SQLAlchemy ORM
 
 PostgreSQL
 
-Business logic is separated from API endpoints and database access.
+Lightweight business logic and validation remain in API routes; repositories are limited to database access. A Service layer is deferred for Version 1.
 
 This improves:
 
@@ -155,7 +151,7 @@ frontend/
 - Separation of Concerns
 - SOLID Principles
 - Repository Pattern
-- Service Layer Pattern
+- Service Layer Deferred for Version 1
 
 ---
 

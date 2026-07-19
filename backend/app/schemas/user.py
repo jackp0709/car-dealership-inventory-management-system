@@ -24,10 +24,10 @@ class UserCreate(UserBase):
 class UserUpdate(BaseModel):
     """Mutable user attributes."""
 
+    model_config = ConfigDict(extra="forbid")
+
     full_name: str | None = Field(default=None, min_length=1, max_length=255)
     email: EmailStr | None = None
-    role: UserRole | None = None
-    is_active: bool | None = None
 
 
 class UserRead(UserBase):

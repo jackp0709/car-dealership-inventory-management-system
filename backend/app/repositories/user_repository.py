@@ -19,6 +19,11 @@ class UserRepository:
         self._session.refresh(user)
         return user
 
+    def get_all(self) -> list[User]:
+        """Return all users ordered by primary key."""
+        statement = select(User).order_by(User.id)
+        return list(self._session.scalars(statement))
+
     def get_by_id(self, user_id: int) -> User | None:
         """Return a user by primary key, if present."""
         return self._session.get(User, user_id)
