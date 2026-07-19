@@ -691,6 +691,7 @@ Authentication Not Required
 
 - Login
 - Health Check
+- Initial `POST /users` bootstrap request, only when no users exist
 
 ---
 
@@ -785,9 +786,15 @@ This section provides a high-level overview of all API endpoints grouped by modu
 | GET | /users | Admin | List all users |
 | GET | /users/{id} | Admin | Get user details |
 | GET | /users/me | Authenticated | Get current user profile |
-| POST | /users | Admin | Create user |
+| POST | /users | Public when no users exist; Authenticated otherwise | Create user |
 | PUT | /users/{id} | Admin | Update user |
 | DELETE | /users/{id} | Admin | Deactivate user |
+
+---
+
+## Initial User Bootstrap
+
+When the database contains no users, `POST /api/v1/users` may be called without a JWT to create the initial account. Once a user exists, the endpoint requires a valid Bearer token. Duplicate email addresses return `409 Conflict`.
 
 ---
 

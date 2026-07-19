@@ -9,7 +9,7 @@ from sqlalchemy.pool import StaticPool
 from app.api.v1.users import router as users_router
 from app.core.auth import create_access_token
 from app.core.dependencies import get_db
-from app.core.security import hash_password
+from app.core.security import hash_password, verify_password
 from app.database.base import Base
 from app.models.user import User
 
@@ -45,6 +45,70 @@ def create_user(session: Session, email: str, full_name: str) -> User:
 def authorization_header(user: User) -> dict[str, str]:
     """Return a valid Bearer header for the supplied user."""
     return {"Authorization": f"Bearer {create_access_token(user.id)}"}
+
+
+def user_payload(email: str = "ada@example.com") -> dict[str, str]:
+    """Return a valid user creation payload."""
+    return {
+        "full_name": "Ada Lovelace",
+        "email": email,
+        "password": "correct-horse-battery-staple",
+    }
+
+
+def test_create_first_user_without_authentication_hashes_and_persists_password() -> None:
+    client, session = create_users_test_client()
+
+    response = client.post("/api/v1/users", json=user_payload())
+    created_user = session.get(User, response.json()["id"])
+
+    assert response.status_code == 201
+    assert response.json()["email"] == "ada@example.com"
+    assert "password" not in response.json()
+    assert created_user is not None
+    assert created_user.email == "ada@example.com"
+    assert created_user.hashed_password != "correct-horse-battery-staple"
+    assert verify_password("correct-horse-battery-staple", created_user.hashed_password)
+    session.close()
+
+
+def test_second_user_requires_authentication() -> None:
+    client, session = create_users_test_client()
+
+    first_response = client.post("/api/v1/users", json=user_payload())
+    unauthenticated_response = client.post(
+        "/api/v1/users",
+        json=user_payload("grace@example.com"),
+    )
+    created_user = session.get(User, first_response.json()["id"])
+    assert created_user is not None
+    authenticated_response = client.post(
+        "/api/v1/users",
+        headers=authorization_header(created_user),
+        json=user_payload("grace@example.com"),
+    )
+
+    assert first_response.status_code == 201
+    assert unauthenticated_response.status_code == 401
+    assert authenticated_response.status_code == 201
+    session.close()
+
+
+def test_create_user_rejects_duplicate_email() -> None:
+    client, session = create_users_test_client()
+    first_response = client.post("/api/v1/users", json=user_payload())
+    created_user = session.get(User, first_response.json()["id"])
+    assert created_user is not None
+
+    duplicate_response = client.post(
+        "/api/v1/users",
+        headers=authorization_header(created_user),
+        json=user_payload(),
+    )
+
+    assert duplicate_response.status_code == 409
+    assert duplicate_response.json()["detail"] == "Email already exists."
+    session.close()
 
 
 def test_list_users_requires_authentication() -> None:

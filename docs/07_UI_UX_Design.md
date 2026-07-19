@@ -181,7 +181,7 @@ The application follows a dashboard-based layout to provide a consistent user ex
 - Purchases
 - Profile
 
-> **Note:** Navigation items are displayed based on the user's role.
+> **Note:** Role-based navigation behaviour is deferred to a future sprint.
 
 ---
 
@@ -269,16 +269,16 @@ View and manage vehicle inventory.
 
 | Component | Description |
 |-----------|-------------|
-| Search Bar | Search vehicles |
-| Filter | Filter by availability |
 | Vehicle Table | Display vehicle details |
-| Pagination | Navigate records |
+| Status | Display the current vehicle status as read-only information |
 
 **Actions**
 
 - View
-- Edit (Admin)
-- Delete (Admin)
+- Edit
+- Delete
+
+> **Version 1 Note:** Vehicle search, filtering, pagination, sorting, and role-based UI behaviour are deferred to future sprints.
 
 ---
 
@@ -296,7 +296,8 @@ Register a new vehicle in the inventory.
 - Color
 - VIN
 - Price
-- Status
+
+> **Version 1 Note:** Vehicle status is managed by the backend and is not editable in the Add Vehicle form.
 
 **Actions**
 
@@ -314,7 +315,7 @@ Update an existing vehicle.
 
 **Fields**
 
-Same as Add Vehicle.
+Same supported vehicle fields as Add Vehicle. Vehicle status is not editable.
 
 **Actions**
 

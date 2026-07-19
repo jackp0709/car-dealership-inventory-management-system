@@ -1,22 +1,68 @@
 """Versioned user CRUD endpoints."""
 
 from fastapi import APIRouter, Depends, HTTPException, Response, status
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.core.auth import get_current_user
 from app.core.dependencies import get_db
+from app.core.security import hash_password
 from app.models.user import User
 from app.repositories.user_repository import UserRepository
-from app.schemas.user import UserRead, UserUpdate
+from app.schemas.user import UserCreate, UserRead, UserUpdate
 
 
 router = APIRouter()
+_optional_bearer_scheme = HTTPBearer(auto_error=False)
 
 
 def _user_not_found() -> HTTPException:
     """Return the standard missing-user response."""
     return HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found.")
+
+
+def _current_user_for_creation(
+    session: Session,
+    repository: UserRepository,
+    credentials: HTTPAuthorizationCredentials | None,
+) -> User | None:
+    """Allow bootstrap creation only while the user table is empty."""
+    if not repository.get_all():
+        return None
+    return get_current_user(credentials=credentials, session=session)
+
+
+@router.post("", response_model=UserRead, status_code=status.HTTP_201_CREATED)
+def create_user(
+    payload: UserCreate,
+    credentials: HTTPAuthorizationCredentials | None = Depends(_optional_bearer_scheme),
+    session: Session = Depends(get_db),
+) -> User:
+    """Create the initial user publicly or later users with JWT authentication."""
+    repository = UserRepository(session)
+    _current_user_for_creation(session, repository, credentials)
+
+    if repository.exists(payload.email):
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Email already exists.")
+
+    try:
+        user = repository.create(
+            User(
+                full_name=payload.full_name,
+                email=payload.email,
+                hashed_password=hash_password(payload.password),
+                role=payload.role,
+            )
+        )
+        session.commit()
+    except IntegrityError as error:
+        session.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Email already exists.",
+        ) from error
+    return user
 
 
 @router.get("", response_model=list[UserRead])
