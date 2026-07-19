@@ -10,6 +10,8 @@ The objective is **not** to implement any business functionality. Instead, creat
 
 ---
 
+# prompt
+
 # Development Mode
 
 Work incrementally.

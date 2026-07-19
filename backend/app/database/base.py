@@ -16,7 +16,3 @@ class Base(DeclarativeBase):
             "pk": "pk_%(table_name)s",
         }
     )
-
-
-# Import persistence models so Alembic can discover their mapped tables.
-from app.models.user import User  # noqa: E402, F401
