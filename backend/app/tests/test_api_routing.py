@@ -13,7 +13,7 @@ def test_versioned_health_check_returns_ok() -> None:
     assert response.json() == {"status": "ok"}
 
 
-def test_sales_routes_and_openapi_documentation_are_registered() -> None:
+def test_sales_and_dashboard_routes_and_openapi_documentation_are_registered() -> None:
     schema = app.openapi()
 
     assert "/api/v1/sales" in schema["paths"]
@@ -21,3 +21,8 @@ def test_sales_routes_and_openapi_documentation_are_registered() -> None:
     assert set(schema["paths"]["/api/v1/sales"]) == {"get", "post"}
     assert set(schema["paths"]["/api/v1/sales/{sale_id}"]) == {"get", "put", "delete"}
     assert schema["paths"]["/api/v1/sales"]["post"]["security"]
+    assert set(schema["paths"]["/api/v1/dashboard/summary"]) == {"get"}
+    assert set(schema["paths"]["/api/v1/dashboard/operational-metrics"]) == {"get"}
+    assert set(schema["paths"]["/api/v1/dashboard/financial-metrics"]) == {"get"}
+    assert set(schema["paths"]["/api/v1/dashboard/recent-activity"]) == {"get"}
+    assert schema["paths"]["/api/v1/dashboard/summary"]["get"]["security"]

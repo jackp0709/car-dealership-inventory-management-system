@@ -1,1 +1,1 @@
-"""Business services reserved for a future sprint."""
+"""Business services for application use cases."""

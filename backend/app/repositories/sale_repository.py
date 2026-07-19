@@ -1,8 +1,12 @@
 """Database access operations for Sale records."""
 
-from sqlalchemy import select
+from datetime import datetime
+from decimal import Decimal
+
+from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
+from app.models.purchase import Purchase
 from app.models.sale import Sale
 
 
@@ -32,6 +36,34 @@ class SaleRepository:
         """Return all sales ordered by primary key."""
         statement = select(Sale).order_by(Sale.id)
         return list(self._session.scalars(statement))
+
+    def get_count(self) -> int:
+        """Return the total number of completed sales."""
+        return int(self._session.scalar(select(func.count(Sale.id))))
+
+    def get_total_sales_revenue(self) -> Decimal:
+        """Return the total revenue from recorded sales."""
+        statement = select(func.coalesce(func.sum(Sale.sale_price), 0))
+        return Decimal(self._session.scalar(statement))
+
+    def get_estimated_gross_profit(self) -> Decimal:
+        """Return realized gross profit for sales with recorded acquisition costs."""
+        statement = select(
+            func.coalesce(func.sum(Sale.sale_price - Purchase.purchase_price), 0)
+        ).join(Purchase, Purchase.vehicle_id == Sale.vehicle_id)
+        return Decimal(self._session.scalar(statement))
+
+    def get_recent_activity_records(
+        self,
+        limit: int,
+    ) -> list[tuple[int, int, str, datetime]]:
+        """Return recently recorded sales in descending creation order."""
+        statement = (
+            select(Sale.id, Sale.vehicle_id, Sale.customer_name, Sale.created_at)
+            .order_by(Sale.created_at.desc(), Sale.id.desc())
+            .limit(limit)
+        )
+        return list(self._session.execute(statement).tuples())
 
     def update(self, sale: Sale) -> Sale:
         """Flush changes to an existing sale in the current transaction."""

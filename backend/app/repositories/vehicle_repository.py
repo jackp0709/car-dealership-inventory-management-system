@@ -1,9 +1,9 @@
 """Database access operations for Vehicle records."""
 
-from sqlalchemy import select
+from sqlalchemy import case, func, select
 from sqlalchemy.orm import Session
 
-from app.models.vehicle import Vehicle
+from app.models.vehicle import Vehicle, VehicleStatus
 
 
 class VehicleRepository:
@@ -27,6 +27,22 @@ class VehicleRepository:
         """Return all vehicles ordered by primary key."""
         statement = select(Vehicle).order_by(Vehicle.id)
         return list(self._session.scalars(statement))
+
+    def get_operational_counts(self) -> tuple[int, int, int]:
+        """Return total, available, and sold inventory counts in one query."""
+        statement = select(
+            func.count(Vehicle.id),
+            func.coalesce(
+                func.sum(case((Vehicle.status == VehicleStatus.AVAILABLE, 1), else_=0)),
+                0,
+            ),
+            func.coalesce(
+                func.sum(case((Vehicle.status == VehicleStatus.SOLD, 1), else_=0)),
+                0,
+            ),
+        )
+        total, available, sold = self._session.execute(statement).one()
+        return int(total), int(available), int(sold)
 
     def update(self, vehicle: Vehicle) -> Vehicle:
         """Flush changes to an existing vehicle in the current transaction."""
