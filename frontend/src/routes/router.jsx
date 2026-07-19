@@ -7,6 +7,10 @@ import PurchaseCreatePage from '../pages/PurchaseCreatePage'
 import PurchaseDetailsPage from '../pages/PurchaseDetailsPage'
 import PurchaseEditPage from '../pages/PurchaseEditPage'
 import PurchaseListPage from '../pages/PurchaseListPage'
+import SaleCreatePage from '../pages/SaleCreatePage'
+import SaleDetailsPage from '../pages/SaleDetailsPage'
+import SaleEditPage from '../pages/SaleEditPage'
+import SaleListPage from '../pages/SaleListPage'
 import VehicleCreatePage from '../pages/VehicleCreatePage'
 import VehicleEditPage from '../pages/VehicleEditPage'
 import VehicleListPage from '../pages/VehicleListPage'
@@ -54,6 +58,22 @@ export const router = createBrowserRouter([
           {
             element: <PurchaseEditPage />,
             path: 'purchases/:purchaseId/edit',
+          },
+          {
+            element: <SaleListPage />,
+            path: 'sales',
+          },
+          {
+            element: <SaleCreatePage />,
+            path: 'sales/new',
+          },
+          {
+            element: <SaleDetailsPage />,
+            path: 'sales/:saleId',
+          },
+          {
+            element: <SaleEditPage />,
+            path: 'sales/:saleId/edit',
           },
           {
             element: <Navigate replace to="/vehicles" />,
