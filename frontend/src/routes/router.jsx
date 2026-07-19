@@ -2,6 +2,7 @@ import { createBrowserRouter, Navigate } from 'react-router-dom'
 
 import App from '../App'
 import ProtectedRoute from '../components/ProtectedRoute'
+import DashboardPage from '../pages/DashboardPage'
 import LoginPage from '../pages/LoginPage'
 import PurchaseCreatePage from '../pages/PurchaseCreatePage'
 import PurchaseDetailsPage from '../pages/PurchaseDetailsPage'
@@ -28,8 +29,12 @@ export const router = createBrowserRouter([
         path: '/',
         children: [
           {
-            element: <Navigate replace to="/vehicles" />,
+            element: <Navigate replace to="/dashboard" />,
             index: true,
+          },
+          {
+            element: <DashboardPage />,
+            path: 'dashboard',
           },
           {
             element: <VehicleListPage />,

@@ -16,6 +16,9 @@ function App() {
           <Typography component="div" sx={{ flexGrow: 1 }} variant="h6">
             Car Dealership Inventory
           </Typography>
+          <Button color="inherit" component={RouterLink} to="/dashboard">
+            Dashboard
+          </Button>
           <Button color="inherit" component={RouterLink} to="/vehicles">
             Vehicles
           </Button>
