@@ -19,6 +19,9 @@ function App() {
           <Button color="inherit" component={RouterLink} to="/vehicles">
             Vehicles
           </Button>
+          <Button color="inherit" component={RouterLink} to="/purchases">
+            Purchases
+          </Button>
           <Button color="inherit" onClick={handleLogout}>
             Logout
           </Button>
