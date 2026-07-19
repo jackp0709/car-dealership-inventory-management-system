@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException, Response, status
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
-from app.core.auth import get_current_user
+from app.core.auth import get_current_user, require_admin
 from app.core.dependencies import get_db
 from app.models.purchase import Purchase
 from app.models.user import User
@@ -24,7 +24,7 @@ def _purchase_not_found() -> HTTPException:
 @router.post("", response_model=PurchaseRead, status_code=status.HTTP_201_CREATED)
 def create_purchase(
     payload: PurchaseCreate,
-    _: User = Depends(get_current_user),
+    _: User = Depends(require_admin),
     session: Session = Depends(get_db),
 ) -> Purchase:
     """Record a vehicle acquisition."""
@@ -80,7 +80,7 @@ def get_purchase(
 def update_purchase(
     purchase_id: int,
     payload: PurchaseUpdate,
-    _: User = Depends(get_current_user),
+    _: User = Depends(require_admin),
     session: Session = Depends(get_db),
 ) -> Purchase:
     """Update the supported vehicle-acquisition attributes."""
@@ -119,7 +119,7 @@ def update_purchase(
 @router.delete("/{purchase_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_purchase(
     purchase_id: int,
-    _: User = Depends(get_current_user),
+    _: User = Depends(require_admin),
     session: Session = Depends(get_db),
 ) -> Response:
     """Delete a vehicle acquisition record."""

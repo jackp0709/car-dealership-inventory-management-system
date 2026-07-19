@@ -1,5 +1,7 @@
 # 1. Database Overview
 
+> **Implementation status (Sprint 20):** This design document preserves early planning decisions. The implemented schema also includes a `Sale` entity with customer and seller details; creating a sale marks an available vehicle as `SOLD`. Consult the migrations and SQLAlchemy models as the authoritative current schema.
+
 ## Purpose
 
 This document records all database-related architectural decisions for the Car Dealership Inventory Management System.

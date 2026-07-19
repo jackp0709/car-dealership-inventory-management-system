@@ -144,6 +144,7 @@ Modules:
 - User Management
 - Vehicle Management
 - Purchase Management
+- Sales Management
 - Dashboard
 - Health Check
 
@@ -195,8 +196,14 @@ Future modules:
 - Purchase Records
 - Acquisition Cost Tracking
 
-Sales are handled by a separate future Sales module. Creating a Purchase record does
-not change a Vehicle's SOLD status.
+Creating a purchase record records a vehicle acquisition and does not mark the vehicle as sold.
+
+### Sales Management
+
+- Sales records and customer details
+- Seller attribution
+- Vehicle availability validation
+- Transactional vehicle status updates to `SOLD`
 
 ---
 
@@ -222,14 +229,10 @@ Frontend follows a Hybrid Architecture.
 
 Structure:
 
-- Pages
-- Components
-- Layouts
-- API Layer
-- Zustand Store
-- Hooks
-- Services
-- Utilities
+- Route definitions and protected-route component
+- Page and form components
+- Shared Axios API client and dashboard API module
+- Material UI theme and layout shell
 
 ---
 
@@ -255,19 +258,7 @@ Restricted navigation based on role.
 
 ## State Management
 
-Global state stores:
-
-- JWT Token
-- Logged-in User
-- User Role
-- Authentication Status
-
-Local component state stores:
-
-- Form Data
-- Search Filters
-- Pagination
-- UI State
+Authentication uses the access token stored in browser local storage. Page-level React state handles form values, request status, errors, and loaded records. The application does not use a separate global-state library in Version 1.
 
 ---
 
@@ -309,10 +300,8 @@ Redirect to Dashboard
 
 JWT contains:
 
-- User ID
-- Email
-- Role
-- Expiration Time
+- User ID (`sub` claim)
+- Expiration time
 
 JWT never contains:
 
@@ -326,7 +315,7 @@ JWT never contains:
 - JWT Authentication
 - Local Storage for Version 1
 - bcrypt Password Hashing
-- 60-minute Token Expiration
+- Configurable token expiration (30 minutes in `.env.example`)
 - No Refresh Tokens in Version 1
 
 ---
@@ -470,13 +459,7 @@ No internal implementation details exposed to users.
 
 # 9. Scalability Strategy
 
-Version 1 supports:
-
-- Modular Architecture
-- Stateless Authentication
-- Pagination
-- Database Indexing
-- Future Feature Expansion
+Version 1 supports modular API routing, stateless authentication, database constraints, and future feature expansion. Pagination is intentionally not implemented for the current list endpoints.
 
 ---
 
@@ -501,7 +484,7 @@ Architecture is intentionally designed to support these additions without major 
 | Large Inventory | ✅ |
 | Modular Expansion | ✅ |
 | Database Growth | ✅ |
-| Docker Deployment | ✅ |
+| Docker Deployment | Not included; configure through the selected hosting platform |
 | Multi-Branch | Future Version |
 | High Availability | Future Version |
 | Horizontal Scaling | Future Version |
@@ -512,6 +495,6 @@ Architecture is intentionally designed to support these additions without major 
 
 The system follows a Layered Three-Tier Architecture combined with a Hybrid Backend and Frontend Architecture.
 
-Business logic is isolated within Services, database access is centralized through Repositories, and authentication is implemented using JWT with Role-Based Access Control.
+Database access is centralized through repositories, lightweight business logic is kept in API routes, and authentication is implemented using JWT with role-based access control.
 
 The architecture emphasizes maintainability, security, modularity, and future scalability while intentionally keeping Version 1 focused on delivering a clean, production-quality inventory management system.

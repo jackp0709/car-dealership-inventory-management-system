@@ -58,7 +58,7 @@ Features include:
 
 ## FR-4 Vehicle Sales
 
-Employees shall be able to sell available vehicles in a future Sales module.
+Employees can sell available vehicles through the Sales module, subject to seller-identity enforcement.
 
 Features include:
 
@@ -258,7 +258,7 @@ Can:
 
 - Search Inventory
 - View Vehicles
-- Record Vehicle Sales (future)
+- Record Vehicle Sales
 
 Cannot:
 

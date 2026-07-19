@@ -12,7 +12,7 @@ from sqlalchemy.orm import Session
 from app.core.config import get_settings
 from app.core.dependencies import get_db
 from app.core.security import verify_password
-from app.models.user import User
+from app.models.user import User, UserRole
 from app.repositories.user_repository import UserRepository
 from app.schemas.auth import TokenData
 
@@ -28,7 +28,7 @@ _invalid_credentials_exception = HTTPException(
 def authenticate_user(session: Session, email: str, password: str) -> User | None:
     """Return the user when the supplied credentials are valid."""
     user = UserRepository(session).get_by_email(email)
-    if user is None or not verify_password(password, user.hashed_password):
+    if user is None or not user.is_active or not verify_password(password, user.hashed_password):
         return None
     return user
 
@@ -74,6 +74,16 @@ def get_current_user(
 
     payload = verify_token(credentials.credentials)
     user = UserRepository(session).get_by_id(int(payload["sub"]))
-    if user is None:
+    if user is None or not user.is_active:
         raise _invalid_credentials_exception
     return user
+
+
+def require_admin(current_user: User = Depends(get_current_user)) -> User:
+    """Resolve the current user only when they have administrator access."""
+    if current_user.role is not UserRole.ADMIN:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Administrator access is required.",
+        )
+    return current_user

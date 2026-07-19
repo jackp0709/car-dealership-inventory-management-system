@@ -4,10 +4,10 @@ from fastapi import APIRouter, Depends, HTTPException, Response, status
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.orm import Session
 
-from app.core.auth import get_current_user
+from app.core.auth import get_current_user, require_admin
 from app.core.dependencies import get_db
 from app.models.sale import Sale
-from app.models.user import User
+from app.models.user import User, UserRole
 from app.models.vehicle import VehicleStatus
 from app.repositories.sale_repository import SaleRepository
 from app.repositories.user_repository import UserRepository
@@ -26,10 +26,15 @@ def _sale_not_found() -> HTTPException:
 @router.post("", response_model=SaleRead, status_code=status.HTTP_201_CREATED)
 def create_sale(
     payload: SaleCreate,
-    _: User = Depends(get_current_user),
+    current_user: User = Depends(get_current_user),
     session: Session = Depends(get_db),
 ) -> Sale:
     """Record a sale and atomically mark its vehicle as sold."""
+    if current_user.role is UserRole.EMPLOYEE and payload.seller_id != current_user.id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Employees can record sales only for themselves.",
+        )
     sale_repository = SaleRepository(session)
     vehicle_repository = VehicleRepository(session)
     vehicle = vehicle_repository.get_by_id(payload.vehicle_id)
@@ -94,7 +99,7 @@ def get_sale(
 def update_sale(
     sale_id: int,
     payload: SaleUpdate,
-    _: User = Depends(get_current_user),
+    _: User = Depends(require_admin),
     session: Session = Depends(get_db),
 ) -> Sale:
     """Update customer details without altering inventory history."""
@@ -121,7 +126,7 @@ def update_sale(
 @router.delete("/{sale_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_sale(
     sale_id: int,
-    _: User = Depends(get_current_user),
+    _: User = Depends(require_admin),
     session: Session = Depends(get_db),
 ) -> Response:
     """Delete a sale and atomically return its vehicle to available inventory."""

@@ -13,7 +13,7 @@ from app.core.auth import create_access_token
 from app.core.dependencies import get_db
 from app.core.security import hash_password
 from app.database.base import Base
-from app.models.user import User
+from app.models.user import User, UserRole
 from app.models.vehicle import FuelType, TransmissionType, Vehicle, VehicleCondition
 
 
@@ -32,12 +32,17 @@ def create_purchases_test_client() -> tuple[TestClient, Session]:
     return TestClient(application), session
 
 
-def create_user(session: Session) -> User:
+def create_user(
+    session: Session,
+    role: UserRole = UserRole.ADMIN,
+    email: str = "ada@example.com",
+) -> User:
     """Persist a user that can authenticate endpoint requests."""
     user = User(
         full_name="Ada Lovelace",
-        email="ada@example.com",
+        email=email,
         hashed_password=hash_password("correct-horse-battery-staple"),
+        role=role,
     )
     session.add(user)
     session.commit()
@@ -220,4 +225,31 @@ def test_update_rejects_duplicate_invoice_and_immutable_fields() -> None:
 
     assert duplicate_response.status_code == 409
     assert immutable_response.status_code == 422
+    session.close()
+
+
+def test_employee_can_view_but_cannot_change_purchases() -> None:
+    client, session = create_purchases_test_client()
+    administrator_headers = authorization_header(create_user(session))
+    employee_headers = authorization_header(
+        create_user(session, role=UserRole.EMPLOYEE, email="employee@example.com")
+    )
+    vehicle = create_vehicle(session)
+    purchase_id = client.post(
+        "/api/v1/purchases",
+        headers=administrator_headers,
+        json=purchase_payload(vehicle.id),
+    ).json()["id"]
+
+    assert client.get("/api/v1/purchases", headers=employee_headers).status_code == 200
+    assert client.get(f"/api/v1/purchases/{purchase_id}", headers=employee_headers).status_code == 200
+    assert client.post(
+        "/api/v1/purchases",
+        headers=employee_headers,
+        json=purchase_payload(vehicle.id, "INV-1002"),
+    ).status_code == 403
+    assert client.put(
+        f"/api/v1/purchases/{purchase_id}", headers=employee_headers, json={"notes": "Updated"}
+    ).status_code == 403
+    assert client.delete(f"/api/v1/purchases/{purchase_id}", headers=employee_headers).status_code == 403
     session.close()

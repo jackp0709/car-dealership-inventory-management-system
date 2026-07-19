@@ -14,7 +14,7 @@ from app.core.dependencies import get_db
 from app.core.security import hash_password
 from app.database.base import Base
 from app.models.sale import Sale
-from app.models.user import User
+from app.models.user import User, UserRole
 from app.models.vehicle import FuelType, TransmissionType, Vehicle, VehicleCondition, VehicleStatus
 from app.repositories.vehicle_repository import VehicleRepository
 
@@ -34,12 +34,17 @@ def create_sales_test_client() -> tuple[TestClient, Session]:
     return TestClient(application), session
 
 
-def create_user(session: Session, email: str = "ada@example.com") -> User:
+def create_user(
+    session: Session,
+    email: str = "ada@example.com",
+    role: UserRole = UserRole.ADMIN,
+) -> User:
     """Persist a user that can authenticate endpoint requests."""
     user = User(
         full_name="Ada Lovelace",
         email=email,
         hashed_password=hash_password("correct-horse-battery-staple"),
+        role=role,
     )
     session.add(user)
     session.commit()
@@ -223,4 +228,34 @@ def test_create_sale_rolls_back_when_inventory_update_fails(monkeypatch: object)
     assert response.status_code == 500
     assert session.query(Sale).count() == 0
     assert session.get(Vehicle, vehicle.id).status is VehicleStatus.AVAILABLE
+    session.close()
+
+
+def test_employee_can_record_only_their_own_sales() -> None:
+    client, session = create_sales_test_client()
+    employee = create_user(session, role=UserRole.EMPLOYEE)
+    other_employee = create_user(session, "grace@example.com", role=UserRole.EMPLOYEE)
+    own_vehicle = create_vehicle(session)
+    other_vehicle = create_vehicle(session, "1HGCM82633A004353")
+    headers = authorization_header(employee)
+
+    own_sale_response = client.post(
+        "/api/v1/sales",
+        headers=headers,
+        json=sale_payload(own_vehicle.id, employee.id),
+    )
+    impersonated_sale_response = client.post(
+        "/api/v1/sales",
+        headers=headers,
+        json=sale_payload(other_vehicle.id, other_employee.id),
+    )
+    update_response = client.put(
+        f"/api/v1/sales/{own_sale_response.json()['id']}",
+        headers=headers,
+        json={"customer_name": "Updated"},
+    )
+
+    assert own_sale_response.status_code == 201
+    assert impersonated_sale_response.status_code == 403
+    assert update_response.status_code == 403
     session.close()

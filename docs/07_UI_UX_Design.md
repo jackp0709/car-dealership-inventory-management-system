@@ -30,7 +30,7 @@ Material UI's default design system will be used to provide a modern, responsive
 ## Target Users
 
 - **Administrator** – Manages users, vehicles, purchases, and system operations.
-- **Employee** – Searches vehicles, records purchases, and views assigned dashboard information.
+- **Employee** – Views inventory, purchases, sales, and dashboard information; may record sales only for their own seller identity.
 
 ---
 
@@ -42,8 +42,8 @@ The application includes the following screens:
 - Dashboard
 - Vehicle Management
 - Purchase Management
+- Sales Management
 - User Management (Admin)
-- User Profile
 
 Each screen is designed with simplicity, usability, and maintainability as the primary goals.
 
@@ -171,17 +171,17 @@ The application follows a dashboard-based layout to provide a consistent user ex
 - Dashboard
 - Vehicles
 - Purchases
+- Sales
 - Users
-- Profile
 
 ### Employee
 
 - Dashboard
 - Vehicles
 - Purchases
-- Profile
+- Sales
 
-> **Note:** Role-based navigation behaviour is deferred to a future sprint.
+The current navigation exposes the shared operational pages. Backend role checks remain the enforcement point for administrator-only mutations and user management.
 
 ---
 
@@ -251,13 +251,14 @@ Provide a quick overview of dealership operations.
 | Total Vehicles | Total inventory count |
 | Available Vehicles | Vehicles available for sale |
 | Sold Vehicles | Total sold vehicles |
-| Recent Purchases | Latest purchase records |
+| Recent Activity | Latest purchase and sale records |
 
 **Actions**
 
 - View Inventory
 - Add Vehicle (Admin)
-- Record Vehicle Acquisition (future)
+- Record Vehicle Acquisition
+- Record Sale
 
 ---
 
@@ -278,7 +279,7 @@ View and manage vehicle inventory.
 - Edit
 - Delete
 
-> **Version 1 Note:** Vehicle search, filtering, pagination, sorting, and role-based UI behaviour are deferred to future sprints.
+> **Version 1 Note:** Pagination, sorting, and advanced filtering are deferred. Backend permissions enforce administrator-only inventory mutations.
 
 ---
 
@@ -354,9 +355,7 @@ View completed vehicle acquisitions.
 
 | Component | Description |
 |-----------|-------------|
-| Search | Search purchases |
 | Purchase Table | Purchase records |
-| Pagination | Navigate records |
 
 **Actions**
 
@@ -373,7 +372,6 @@ Manage system users.
 | Component | Description |
 |-----------|-------------|
 | User Table | List all users |
-| Search | Find users |
 | Role Badge | Display user role |
 
 **Actions**
@@ -384,22 +382,19 @@ Manage system users.
 
 ---
 
-# 4.9 Profile
+# 4.9 Sales Management
 
 **Purpose**
 
-Allow users to view their account information.
-
-**Information**
-
-- Full Name
-- Email
-- Role
+Record completed vehicle sales and retain customer, seller, price, and sale-date details.
 
 **Actions**
 
-- Change Password
-- Update Profile
+- View sale records and details
+- Record a sale
+- Edit or delete sales (Admin only)
+
+Employees can create a sale only when they are the selected seller; the API enforces this rule.
 
 # 5. Common Components
 

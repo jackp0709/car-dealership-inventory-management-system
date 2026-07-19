@@ -5,10 +5,10 @@ from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
-from app.core.auth import get_current_user
+from app.core.auth import get_current_user, require_admin
 from app.core.dependencies import get_db
 from app.core.security import hash_password
-from app.models.user import User
+from app.models.user import User, UserRole
 from app.repositories.user_repository import UserRepository
 from app.schemas.user import UserCreate, UserRead, UserUpdate
 
@@ -22,7 +22,7 @@ def _user_not_found() -> HTTPException:
     return HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found.")
 
 
-def _current_user_for_creation(
+def _current_admin_for_creation(
     session: Session,
     repository: UserRepository,
     credentials: HTTPAuthorizationCredentials | None,
@@ -30,7 +30,13 @@ def _current_user_for_creation(
     """Allow bootstrap creation only while the user table is empty."""
     if not repository.get_all():
         return None
-    return get_current_user(credentials=credentials, session=session)
+    current_user = get_current_user(credentials=credentials, session=session)
+    if current_user.role is not UserRole.ADMIN:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Administrator access is required.",
+        )
+    return current_user
 
 
 @router.post("", response_model=UserRead, status_code=status.HTTP_201_CREATED)
@@ -39,9 +45,14 @@ def create_user(
     credentials: HTTPAuthorizationCredentials | None = Depends(_optional_bearer_scheme),
     session: Session = Depends(get_db),
 ) -> User:
-    """Create the initial user publicly or later users with JWT authentication."""
+    """Create the initial administrator or later users as an administrator."""
     repository = UserRepository(session)
-    _current_user_for_creation(session, repository, credentials)
+    current_user = _current_admin_for_creation(session, repository, credentials)
+    if current_user is None and payload.role is not UserRole.ADMIN:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="The initial user must be an administrator.",
+        )
 
     if repository.exists(payload.email):
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Email already exists.")
@@ -67,7 +78,7 @@ def create_user(
 
 @router.get("", response_model=list[UserRead])
 def list_users(
-    _: User = Depends(get_current_user),
+    _: User = Depends(require_admin),
     session: Session = Depends(get_db),
 ) -> list[User]:
     """Return all users without exposing password hashes."""
@@ -77,7 +88,7 @@ def list_users(
 @router.get("/{user_id}", response_model=UserRead)
 def get_user(
     user_id: int,
-    _: User = Depends(get_current_user),
+    _: User = Depends(require_admin),
     session: Session = Depends(get_db),
 ) -> User:
     """Return a user by identifier."""
@@ -91,7 +102,7 @@ def get_user(
 def update_user(
     user_id: int,
     payload: UserUpdate,
-    _: User = Depends(get_current_user),
+    _: User = Depends(require_admin),
     session: Session = Depends(get_db),
 ) -> User:
     """Update the supported user attributes."""
@@ -123,7 +134,7 @@ def update_user(
 @router.delete("/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_user(
     user_id: int,
-    _: User = Depends(get_current_user),
+    _: User = Depends(require_admin),
     session: Session = Depends(get_db),
 ) -> Response:
     """Permanently delete a user."""

@@ -60,6 +60,7 @@ Included
 - User Management
 - Vehicle Management
 - Purchase Management
+- Sales Management
 - Dashboard Statistics
 - Vehicle Search
 - Health Check
@@ -632,7 +633,7 @@ exp
 ## Token Expiry
 
 ```
-60 Minutes
+Configurable (30 minutes in `.env.example`)
 ```
 
 ---
@@ -663,6 +664,7 @@ Authentication Required
 - User APIs
 - Vehicle APIs
 - Purchase APIs
+- Sales APIs
 - Dashboard APIs
 
 Authentication Not Required
@@ -693,6 +695,7 @@ EMPLOYEE
 - View All Vehicles
 - View Dashboard
 - View Purchase History
+- View Sales History
 
 ---
 
@@ -700,7 +703,7 @@ EMPLOYEE
 
 - View Available Vehicles
 - Search Vehicles
-- Record Vehicle Sales (future)
+- Record Vehicle Sales (only for the authenticated employee's seller identity)
 - View Assigned Dashboard
 
 ---
@@ -791,26 +794,42 @@ When the database contains no users, `POST /api/v1/users` may be called without 
 
 | Method | Endpoint | Access | Purpose |
 |---------|----------|--------|---------|
-| GET | /purchases | Authenticated | View vehicle acquisition history |
-| GET | /purchases/{id} | Authenticated | View acquisition details |
-| POST | /purchases | Authenticated | Record a vehicle acquisition |
-| PUT | /purchases/{id} | Authenticated | Update supported acquisition details |
-| DELETE | /purchases/{id} | Authenticated | Delete a vehicle acquisition record |
+| GET | /purchases | Admin, Employee | View vehicle acquisition history |
+| GET | /purchases/{id} | Admin, Employee | View acquisition details |
+| POST | /purchases | Admin | Record a vehicle acquisition |
+| PUT | /purchases/{id} | Admin | Update supported acquisition details |
+| DELETE | /purchases/{id} | Admin | Delete a vehicle acquisition record |
 
-Purchase APIs represent dealership vehicle acquisitions. Vehicle sales, customer
-details, and SOLD status changes belong to the future Sales API.
+Purchase APIs represent dealership vehicle acquisitions and do not change a vehicle's sold status.
 
 ---
 
-# 5.5 Dashboard APIs
+# 5.5 Sales APIs
 
 | Method | Endpoint | Access | Purpose |
 |---------|----------|--------|---------|
-| GET | /dashboard | Admin, Employee | Dashboard summary |
+| GET | /sales | Admin, Employee | View sales history |
+| GET | /sales/{id} | Admin, Employee | View sale details |
+| POST | /sales | Admin, Employee | Record a sale; employees may only select themselves as seller |
+| PUT | /sales/{id} | Admin | Update a sale |
+| DELETE | /sales/{id} | Admin | Delete a sale |
+
+Creating a sale validates that the vehicle is available and marks it `SOLD` as part of the operation.
 
 ---
 
-# 5.6 Health Check API
+# 5.6 Dashboard APIs
+
+| Method | Endpoint | Access | Purpose |
+|---------|----------|--------|---------|
+| GET | /dashboard/summary | Admin, Employee | Combined dashboard response |
+| GET | /dashboard/operational-metrics | Admin, Employee | Vehicle, purchase, and sale counts |
+| GET | /dashboard/financial-metrics | Admin, Employee | Purchase cost, sales revenue, and estimated gross profit |
+| GET | /dashboard/recent-activity | Admin, Employee | Recent purchases and sales |
+
+---
+
+# 5.7 Health Check API
 
 | Method | Endpoint | Access | Purpose |
 |---------|----------|--------|---------|

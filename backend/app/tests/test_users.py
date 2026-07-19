@@ -11,7 +11,7 @@ from app.core.auth import create_access_token
 from app.core.dependencies import get_db
 from app.core.security import hash_password, verify_password
 from app.database.base import Base
-from app.models.user import User
+from app.models.user import User, UserRole
 
 
 def create_users_test_client() -> tuple[TestClient, Session]:
@@ -29,12 +29,18 @@ def create_users_test_client() -> tuple[TestClient, Session]:
     return TestClient(application), session
 
 
-def create_user(session: Session, email: str, full_name: str) -> User:
+def create_user(
+    session: Session,
+    email: str,
+    full_name: str,
+    role: UserRole = UserRole.ADMIN,
+) -> User:
     """Persist a user for endpoint tests."""
     user = User(
         full_name=full_name,
         email=email,
         hashed_password=hash_password("correct-horse-battery-staple"),
+        role=role,
     )
     session.add(user)
     session.commit()
@@ -53,6 +59,7 @@ def user_payload(email: str = "ada@example.com") -> dict[str, str]:
         "full_name": "Ada Lovelace",
         "email": email,
         "password": "correct-horse-battery-staple",
+        "role": "ADMIN",
     }
 
 
@@ -178,4 +185,25 @@ def test_delete_user_and_reject_missing_user() -> None:
     assert missing_response.status_code == 404
     assert missing_response.json()["detail"] == "User not found."
     assert invalid_id_response.status_code == 422
+    session.close()
+
+
+def test_employee_cannot_manage_users() -> None:
+    client, session = create_users_test_client()
+    administrator = create_user(session, "admin@example.com", "Admin")
+    employee = create_user(
+        session,
+        "employee@example.com",
+        "Employee",
+        role=UserRole.EMPLOYEE,
+    )
+    headers = authorization_header(employee)
+
+    assert client.get("/api/v1/users", headers=headers).status_code == 403
+    assert client.post(
+        "/api/v1/users",
+        headers=headers,
+        json=user_payload("another@example.com"),
+    ).status_code == 403
+    assert client.delete(f"/api/v1/users/{administrator.id}", headers=headers).status_code == 403
     session.close()

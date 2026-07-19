@@ -1,5 +1,7 @@
 # Phase 2 - Development Standards & Technology Stack
 
+> **Implementation status (Sprint 20):** This is a planning-era standards document. The current implementation uses React component state rather than Zustand and does not include Docker files. For the deployable configuration and verified commands, use the root README and [Testing and Deployment Guide](09_Testing_Deployment.md).
+
 ## Purpose
 
 This document defines the technology stack, development standards, coding practices, project structure, and engineering principles for the Car Dealership Inventory Management System.

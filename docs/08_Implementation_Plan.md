@@ -1,5 +1,7 @@
 # 1. Implementation Overview
 
+> **Implementation status (Sprint 20):** This file is the original sprint roadmap and is retained as project history. Sales functionality was completed after the initial plan; final setup, deployment, and verification guidance is maintained in the root README and [Testing and Deployment Guide](09_Testing_Deployment.md).
+
 ## Purpose
 
 This document outlines the implementation approach for the Car Dealership Inventory Management System. It provides a clear development sequence to ensure the project is completed efficiently while maintaining code quality.

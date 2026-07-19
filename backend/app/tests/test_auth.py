@@ -132,3 +132,23 @@ def test_current_user_dependency_rejects_invalid_token() -> None:
     assert response.status_code == 401
     assert response.json()["detail"] == "Could not validate credentials."
     session.close()
+
+
+def test_inactive_user_cannot_log_in_or_access_protected_routes() -> None:
+    client, session = create_auth_test_client()
+    user = create_user(session)
+    user.is_active = False
+    session.commit()
+
+    login_response = client.post(
+        "/api/v1/auth/login",
+        json={"email": "ada@example.com", "password": "correct-horse-battery-staple"},
+    )
+    protected_response = client.get(
+        "/protected",
+        headers={"Authorization": f"Bearer {create_access_token(user.id)}"},
+    )
+
+    assert login_response.status_code == 401
+    assert protected_response.status_code == 401
+    session.close()

@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException, Response, status
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
-from app.core.auth import get_current_user
+from app.core.auth import get_current_user, require_admin
 from app.core.dependencies import get_db
 from app.models.user import User
 from app.models.vehicle import Vehicle, VehicleStatus
@@ -23,7 +23,7 @@ def _vehicle_not_found() -> HTTPException:
 @router.post("", response_model=VehicleRead, status_code=status.HTTP_201_CREATED)
 def create_vehicle(
     payload: VehicleCreate,
-    _: User = Depends(get_current_user),
+    _: User = Depends(require_admin),
     session: Session = Depends(get_db),
 ) -> Vehicle:
     """Add a vehicle to inventory."""
@@ -65,7 +65,7 @@ def get_vehicle(
 def update_vehicle(
     vehicle_id: int,
     payload: VehicleUpdate,
-    _: User = Depends(get_current_user),
+    _: User = Depends(require_admin),
     session: Session = Depends(get_db),
 ) -> Vehicle:
     """Update the supported vehicle attributes."""
@@ -85,7 +85,7 @@ def update_vehicle(
 @router.delete("/{vehicle_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_vehicle(
     vehicle_id: int,
-    _: User = Depends(get_current_user),
+    _: User = Depends(require_admin),
     session: Session = Depends(get_db),
 ) -> Response:
     """Permanently delete an available vehicle."""
