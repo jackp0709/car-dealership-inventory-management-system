@@ -791,9 +791,11 @@ When the database contains no users, `POST /api/v1/users` may be called without 
 
 | Method | Endpoint | Access | Purpose |
 |---------|----------|--------|---------|
-| GET | /purchases | Admin | View vehicle acquisition history |
-| GET | /purchases/{id} | Admin | View acquisition details |
-| POST | /purchases | Admin | Record a vehicle acquisition |
+| GET | /purchases | Authenticated | View vehicle acquisition history |
+| GET | /purchases/{id} | Authenticated | View acquisition details |
+| POST | /purchases | Authenticated | Record a vehicle acquisition |
+| PUT | /purchases/{id} | Authenticated | Update supported acquisition details |
+| DELETE | /purchases/{id} | Authenticated | Delete a vehicle acquisition record |
 
 Purchase APIs represent dealership vehicle acquisitions. Vehicle sales, customer
 details, and SOLD status changes belong to the future Sales API.

@@ -1,9 +1,9 @@
 """Pydantic schemas for vehicle acquisition data exchange."""
 
-from datetime import datetime
+from datetime import date, datetime
 from decimal import Decimal
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from app.models.purchase import PaymentStatus
 
@@ -17,6 +17,14 @@ class PurchaseBase(BaseModel):
     invoice_number: str = Field(min_length=1, max_length=100)
     payment_status: PaymentStatus = PaymentStatus.PENDING
     notes: str | None = None
+
+    @field_validator("purchase_date")
+    @classmethod
+    def purchase_date_must_not_be_in_the_future(cls, value: datetime) -> datetime:
+        """Reject acquisition dates after the current calendar date."""
+        if value.date() > date.today():
+            raise ValueError("Purchase date cannot be in the future.")
+        return value
 
 
 class PurchaseCreate(PurchaseBase):

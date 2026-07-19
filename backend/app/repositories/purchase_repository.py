@@ -28,6 +28,11 @@ class PurchaseRepository:
         statement = select(Purchase).where(Purchase.vehicle_id == vehicle_id)
         return self._session.scalar(statement)
 
+    def get_by_invoice_number(self, invoice_number: str) -> Purchase | None:
+        """Return a purchase by supplier invoice number, if present."""
+        statement = select(Purchase).where(Purchase.invoice_number == invoice_number)
+        return self._session.scalar(statement)
+
     def get_all(self) -> list[Purchase]:
         """Return all purchases ordered by primary key."""
         statement = select(Purchase).order_by(Purchase.id)
