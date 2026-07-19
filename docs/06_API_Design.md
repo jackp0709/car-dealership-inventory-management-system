@@ -484,27 +484,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 # 3.6 Pagination Standard
 
-Collection endpoints should support pagination.
-
-Standard Query Parameters
-
-```
-?page=1&page_size=20
-```
-
-Example
-
-```
-GET /vehicles?page=2&page_size=20
-```
-
----
-
-## Final Decisions
-
-- Default page size: 20
-- Pagination applies only to collection endpoints.
-- Individual resource endpoints do not require pagination.
+Vehicle listing returns all records in Version 1. Pagination for `GET /vehicles` is intentionally deferred to a future version.
 
 ---
 
