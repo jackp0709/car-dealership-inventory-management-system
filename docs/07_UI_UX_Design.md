@@ -257,7 +257,7 @@ Provide a quick overview of dealership operations.
 
 - View Inventory
 - Add Vehicle (Admin)
-- Purchase Vehicle
+- Record Vehicle Acquisition (future)
 
 ---
 
@@ -324,22 +324,24 @@ Same supported vehicle fields as Add Vehicle. Vehicle status is not editable.
 
 ---
 
-# 4.6 Purchase Vehicle
+# 4.6 Record Purchase Acquisition
 
 **Purpose**
 
-Record a vehicle sale.
+Record a vehicle acquisition into inventory.
 
 **Fields**
 
-- Customer Name
-- Customer Phone
 - Selected Vehicle
-- Selling Price
+- Supplier Name
+- Purchase Price
+- Purchase Date
+- Invoice Number
+- Payment Status
 
 **Actions**
 
-- Complete Purchase
+- Record Purchase
 - Cancel
 
 ---
@@ -348,7 +350,7 @@ Record a vehicle sale.
 
 **Purpose**
 
-View completed purchases.
+View completed vehicle acquisitions.
 
 | Component | Description |
 |-----------|-------------|

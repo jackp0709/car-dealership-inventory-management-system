@@ -58,14 +58,14 @@ Features include:
 
 ## FR-4 Vehicle Sales
 
-Employees shall be able to sell available vehicles.
+Employees shall be able to sell available vehicles in a future Sales module.
 
 Features include:
 
-- Purchase Vehicle
-- Prevent Duplicate Purchase
+- Create a Sale record
+- Prevent duplicate sales
 - Automatically update vehicle status to Sold
-- Capture customer details during purchase
+- Capture customer details during sale
 
 ---
 
@@ -196,15 +196,15 @@ Future versions may introduce:
 
 ---
 
-## BR-3 Purchase Rule
+## BR-3 Sale Rule
 
-Only Available vehicles can be purchased.
+Only Available vehicles can be sold.
 
-After purchase:
+After sale:
 
 Available → Sold
 
-A Sold vehicle cannot be purchased again.
+A Sold vehicle cannot be sold again.
 
 ---
 
@@ -258,7 +258,7 @@ Can:
 
 - Search Inventory
 - View Vehicles
-- Purchase Vehicles
+- Record Vehicle Sales (future)
 
 Cannot:
 
@@ -419,8 +419,8 @@ Every major engineering decision must have a clear technical or business justifi
 
 ### Sales
 
-- Purchase Vehicle
-- Prevent Duplicate Purchase
+- Create Sale record
+- Prevent duplicate sales
 - Store Customer Name
 - Store Customer Phone Number
 
@@ -538,7 +538,7 @@ The following features were intentionally deferred to keep Version 1 focused and
 |----------------------------|----------|--------------------------------------------------|
 | Vehicle Reservation        | Deferred | Valuable but increases workflow complexity       |
 | Multi-Branch Support       | Deferred | Single dealership assumption                     |
-| Customer Management Module | Deferred | Purchase information is sufficient for Version 1 |
+| Customer Management Module | Deferred | Future Sale information is sufficient for Version 1 |
 | Service History            | Deferred | Separate business domain                         |
 | Payment Gateway            | Deferred | Outside assignment scope                         |
 | AI Forecasting             | Deferred | Better suited for Version 2 or Version 3         |

@@ -255,7 +255,7 @@ Before submission, verify that:
 - [ ] User authentication works correctly.
 - [ ] User Management functions correctly.
 - [ ] Vehicle Management functions correctly.
-- [ ] Purchase workflow completes successfully.
+- [ ] Purchase acquisition workflow completes successfully.
 - [ ] Dashboard displays accurate information.
 - [ ] API requests complete successfully.
 - [ ] Database operations execute correctly.
@@ -315,9 +315,9 @@ This checklist ensures the project meets all functional, technical, and document
 
 ### Purchase Management
 
-- [ ] Purchase workflow completes successfully.
-- [ ] Customer details are recorded.
-- [ ] Inventory updates correctly after purchase.
+- [ ] Purchase acquisition workflow completes successfully.
+- [ ] Supplier details are recorded.
+- [ ] Vehicle status remains unchanged after purchase acquisition.
 - [ ] Purchase history is displayed accurately.
 
 ### Dashboard

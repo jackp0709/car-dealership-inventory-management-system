@@ -222,13 +222,14 @@ The project will be developed in incremental phases. Each phase consists of mult
 
 # Phase 4 – Purchase Management
 
-**Goal:** Implement the vehicle purchase workflow.
+**Goal:** Establish vehicle acquisition records. Vehicle sales are deferred to a
+future Sales module.
 
 | Sprint | Objective | Expected Commit |
 |---------|-----------|-----------------|
-| Sprint 11 | Implement Purchase model and backend APIs | `feat: implement purchase module` |
-| Sprint 12 | Develop Purchase pages and history interface | `feat: develop purchase UI` |
-| Sprint 13 | Integrate purchase workflow and update vehicle availability | `feat: integrate purchase workflow` |
+| Sprint 11 | Implement Purchase backend foundation | `feat: implement purchase foundation` |
+| Sprint 12 | Complete Purchase CRUD APIs | `feat: complete purchase APIs` |
+| Sprint 13 | Develop Purchase pages and history interface | `feat: develop purchase UI` |
 
 ---
 
@@ -286,7 +287,7 @@ Development progress will be tracked through milestone-based checkpoints. A mile
 | Project Foundation | Backend, frontend, database, and project structure are successfully configured. |
 | Authentication & User Management | Users can log in securely and user management features are fully functional. |
 | Vehicle Management | Vehicle CRUD, search, validation, and inventory management are complete. |
-| Purchase Management | Vehicle purchase workflow updates inventory and purchase history correctly. |
+| Purchase Management | Vehicle acquisition records and purchase history are implemented. |
 | Dashboard & Integration | Dashboard displays accurate statistics and all frontend modules are integrated with backend APIs. |
 | Final Submission | Testing completed, documentation updated, deployment verified, and submission package prepared. |
 

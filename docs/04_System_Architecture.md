@@ -190,10 +190,13 @@ Future modules:
 
 ### Purchase Management
 
-- Vehicle Purchase
-- Customer Information
+- Vehicle Acquisition
+- Supplier Information
 - Purchase Records
-- Inventory Update
+- Acquisition Cost Tracking
+
+Sales are handled by a separate future Sales module. Creating a Purchase record does
+not change a Vehicle's SOLD status.
 
 ---
 

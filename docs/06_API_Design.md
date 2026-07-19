@@ -700,7 +700,7 @@ EMPLOYEE
 
 - View Available Vehicles
 - Search Vehicles
-- Purchase Vehicles
+- Record Vehicle Sales (future)
 - View Assigned Dashboard
 
 ---
@@ -791,9 +791,12 @@ When the database contains no users, `POST /api/v1/users` may be called without 
 
 | Method | Endpoint | Access | Purpose |
 |---------|----------|--------|---------|
-| GET | /purchases | Admin | View purchase history |
-| GET | /purchases/{id} | Admin | View purchase details |
-| POST | /purchases | Employee | Purchase a vehicle |
+| GET | /purchases | Admin | View vehicle acquisition history |
+| GET | /purchases/{id} | Admin | View acquisition details |
+| POST | /purchases | Admin | Record a vehicle acquisition |
+
+Purchase APIs represent dealership vehicle acquisitions. Vehicle sales, customer
+details, and SOLD status changes belong to the future Sales API.
 
 ---
 

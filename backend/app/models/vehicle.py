@@ -14,7 +14,7 @@ from sqlalchemy import (
     Text,
     func,
 )
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database.base import Base
 
@@ -115,3 +115,10 @@ class Vehicle(Base):
         server_default=func.now(),
         onupdate=func.now(),
     )
+    purchase: Mapped["Purchase | None"] = relationship(
+        back_populates="vehicle",
+        uselist=False,
+    )
+
+
+import app.models.purchase  # noqa: E402, F401

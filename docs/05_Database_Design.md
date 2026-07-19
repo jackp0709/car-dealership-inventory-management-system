@@ -196,7 +196,7 @@ Users are responsible for:
 
 - Managing inventory (Admin)
 - Registering employees (Admin)
-- Processing vehicle purchases (Employee)
+- Recording vehicle acquisitions (Admin)
 - Accessing dashboards
 - Logging into the application
 
@@ -444,20 +444,18 @@ Reason:
 ## Notes for Developers
 
 - Never update VIN after creation.
-- Status changes only through purchase workflow.
+- Status changes only through the future Sales workflow.
 - Inventory count should always be calculated from AVAILABLE vehicles.
 
 # 4.3 Purchase Entity
 
 ## Purpose
 
-Represents a completed vehicle sale.
+Represents the dealership's acquisition of a vehicle into inventory.
 
-A Purchase record permanently stores the details of a vehicle transaction and acts as the dealership's historical sales record.
+A Purchase record permanently stores the supplier and cost details for a vehicle acquisition.
 
-Every purchase is linked to:
-- One Vehicle
-- One Employee (Seller)
+Every purchase is linked to one Vehicle.
 
 ---
 
@@ -467,36 +465,36 @@ Every purchase is linked to:
 |---------|------|------|
 | id | Integer | Primary Key |
 | vehicle_id | Integer | References Vehicle |
-| customer_name | String | Customer full name |
-| customer_phone | String | Customer contact number |
-| sold_by | Integer | References User |
-| selling_price | Decimal | Final selling price snapshot |
-| purchase_date | Timestamp | Date & time of purchase |
+| supplier_name | String | Supplier name |
+| purchase_price | Decimal | Acquisition cost |
+| purchase_date | Timestamp | Date of acquisition |
+| invoice_number | String | Supplier invoice identifier |
+| payment_status | Enum | PENDING / PAID |
 | notes | Text | Optional remarks |
 | created_at | Timestamp | Record creation timestamp |
+| updated_at | Timestamp | Last modification timestamp |
 
 ---
 
 ## Final Decisions
 
-- One purchase represents one completed vehicle sale.
-- Customer information is stored directly in the Purchase table.
-- Selling price is copied from Vehicle during purchase.
-- Purchase records are permanent.
-- Purchase records cannot be deleted.
-- Purchase records cannot be reassigned to another vehicle.
+- One purchase represents one vehicle acquisition.
+- Supplier information is stored directly in the Purchase table.
+- Purchase price is retained as the acquisition-cost record.
+- Each vehicle may have at most one purchase record.
+- Purchases do not include customer, seller, or sale-price information.
+- Vehicle SOLD status changes are reserved for the future Sales module.
 
 ---
 
 ## Business Rules
 
-- A vehicle can only have one purchase.
+- A vehicle can only have one purchase record.
 - Purchase must reference an existing vehicle.
-- Purchase must reference an existing employee.
-- Customer Name is mandatory.
-- Customer Phone is mandatory.
-- Selling Price is stored as a historical snapshot.
-- Purchase creation and vehicle status update must occur within a single transaction.
+- Supplier name and invoice number are mandatory.
+- Purchase price must be positive.
+- Invoice numbers are unique.
+- Purchase creation does not alter vehicle status.
 
 ---
 
@@ -504,16 +502,15 @@ Every purchase is linked to:
 
 Allowed
 
-- customer_name
-- customer_phone
+- supplier_name
+- invoice_number
+- payment_status
 - notes
 
 Not Allowed
 
 - vehicle_id
-- sold_by
-- selling_price
-- purchase_date
+- purchase_price
 
 ---
 
@@ -521,63 +518,61 @@ Not Allowed
 
 - Primary Key → id
 - Foreign Key → vehicle_id
-- Foreign Key → sold_by
 - Unique → vehicle_id
-- NOT NULL → customer_name
-- NOT NULL → customer_phone
-- NOT NULL → selling_price
+- Unique → invoice_number
+- NOT NULL → supplier_name
+- NOT NULL → purchase_price
 - NOT NULL → purchase_date
+- NOT NULL → invoice_number
+- NOT NULL → payment_status
 
 ---
 
 ## Rejected Alternatives
 
-### Customer Table
+### Supplier Table
 
 Rejected.
 
 Reason:
-- Customer management is outside Version 1 scope.
-- Customer information is only required during purchase.
+- Supplier management is outside Version 1 scope.
+- Supplier information is only required during acquisition.
 - Separate table would increase complexity without business value.
 
 ---
 
-### Payment Table
+### Sales Table
 
 Deferred.
 
 Reason:
-- Payment processing is not included in Version 1.
+- Sales are a separate future domain and must not be conflated with vehicle acquisition.
 
 ---
 
-### Multiple Purchases per Vehicle
+### Multiple Acquisition Records per Vehicle
 
 Rejected.
 
 Reason:
-- One physical vehicle can only be sold once.
+- One physical vehicle is acquired once.
 
 ---
 
 ## Future Scope
 
-- Customer Entity
-- Payment Records
-- Invoice Generation
-- Financing Information
-- Delivery Status
-- Purchase Cancellation Workflow
+- Supplier Management
+- Purchase Payment Records
+- Invoice Document Storage
+- Sales Entity
 
 ---
 
 ## Notes for Developers
 
-- Purchase records represent historical business data.
-- Never overwrite historical selling prices.
-- Vehicle status must change to SOLD immediately after successful purchase.
-- Purchase creation must always use a database transaction.
+- Purchase records represent historical acquisition data.
+- Vehicle status must not change when a Purchase is created.
+- Sales records, customers, and seller details belong to the future Sales module.
 
 ---
 
@@ -587,40 +582,13 @@ Reason:
 
 | Parent Entity | Child Entity | Relationship |
 |--------------|-------------|--------------|
-| User | Purchase | One-to-Many |
 | Vehicle | Purchase | One-to-One |
-
----
-
-## User → Purchase
-
-One employee can process multiple vehicle sales.
-
-Relationship
-
-```
-User (1)
-    │
-    │
-    └──────< Purchase (Many)
-```
-
-Foreign Key
-
-```
-purchase.sold_by → user.id
-```
-
-Delete Rule
-
-- Users are never deleted.
-- Users are deactivated using `is_active`.
 
 ---
 
 ## Vehicle → Purchase
 
-One vehicle can only be sold once.
+One vehicle can only have one acquisition record.
 
 Relationship
 
@@ -639,15 +607,15 @@ purchase.vehicle_id → vehicle.id
 
 Delete Rule
 
-- Vehicle cannot be deleted after sale.
-- Purchase history must remain valid.
+- A purchase record cannot reference a deleted vehicle.
 
 ---
 
 ## Final Decisions
 
-- Purchase acts as the bridge between Vehicle and User.
-- Customer is not an independent entity.
+- Purchase records vehicle acquisition only.
+- Supplier is not an independent entity.
+- The future Sales entity will bridge Vehicle and User.
 - Relationships are intentionally minimal.
 - Avoid unnecessary joins.
 
@@ -669,7 +637,7 @@ Reason
 
 Customer management is outside the current project scope.
 
-Customer details required during purchase are stored directly inside the Purchase table.
+Customer details will be stored directly inside the future Sales table.
 
 ---
 
@@ -862,7 +830,6 @@ These rules act as the authoritative reference for backend implementation and da
 | Child Table | Column | References |
 |--------------|--------|------------|
 | Purchase | vehicle_id | Vehicle.id |
-| Purchase | sold_by | User.id |
 
 ---
 
@@ -899,10 +866,12 @@ Each physical vehicle has a unique VIN.
 ## Purchase
 
 - vehicle_id must be unique.
+- invoice_number must be unique.
 
 Reason
 
-One vehicle can only be sold once.
+One vehicle can only have one acquisition record, and each supplier invoice
+identifies one acquisition.
 
 ---
 
@@ -936,11 +905,11 @@ One vehicle can only be sold once.
 ## Purchase
 
 - vehicle_id
-- customer_name
-- customer_phone
-- sold_by
-- selling_price
+- supplier_name
+- purchase_price
 - purchase_date
+- invoice_number
+- payment_status
 
 ---
 
@@ -1140,43 +1109,25 @@ Purchase must reference an existing vehicle.
 
 ## BR-16
 
-Purchase must reference an existing employee.
+One vehicle can have only one purchase.
 
 ---
 
 ## BR-17
 
-Customer Name is mandatory.
+Purchase price records the vehicle acquisition cost.
+
+Future price changes do not affect historical purchase records.
 
 ---
 
 ## BR-18
 
-Customer Phone is mandatory.
+Purchase creation must not change the vehicle status.
 
 ---
 
 ## BR-19
-
-One vehicle can have only one purchase.
-
----
-
-## BR-20
-
-Selling price is copied into Purchase during sale.
-
-Future price changes must not affect historical purchases.
-
----
-
-## BR-21
-
-Purchase creation and vehicle status update must execute inside one database transaction.
-
----
-
-## BR-22
 
 Historical purchase records are permanent.
 
@@ -1278,29 +1229,27 @@ Not Allowed
 
 Allowed
 
-- customer_name
-- customer_phone
+- supplier_name
+- invoice_number
+- payment_status
 - notes
 
 Not Allowed
 
 - vehicle_id
-- sold_by
-- selling_price
-- purchase_date
+- purchase_price
 
 ---
 
 # 5.10 Transaction Rules
 
-## Purchase Transaction
+## Purchase Acquisition Transaction
 
 The following operations must execute within a single database transaction.
 
-1. Validate vehicle availability.
+1. Validate that the vehicle exists and has no Purchase record.
 2. Create Purchase record.
-3. Update Vehicle status to SOLD.
-4. Commit transaction.
+3. Commit transaction.
 
 If any step fails:
 
@@ -1358,7 +1307,7 @@ Examples
 - full_name
 - purchase_price
 - selling_price
-- customer_phone
+- invoice_number
 - created_at
 
 ---
@@ -1385,7 +1334,7 @@ Examples
 
 ```
 vehicle_id
-sold_by
+invoice_number
 ```
 
 ---
@@ -1533,8 +1482,8 @@ Not Nullable
 | model | 100 |
 | color | 30 |
 | vin | 17 |
-| customer_name | 100 |
-| customer_phone | 20 |
+| supplier_name | 255 |
+| invoice_number | 100 |
 
 ---
 
@@ -1604,7 +1553,7 @@ Vehicle
 Purchase
 
 - purchase_date
-- sold_by
+- invoice_number
 
 ---
 
