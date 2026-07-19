@@ -4,7 +4,7 @@ from datetime import datetime
 from enum import Enum
 
 from sqlalchemy import Boolean, DateTime, Enum as SqlAlchemyEnum, String, func
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database.base import Base
 
@@ -48,3 +48,7 @@ class User(Base):
         server_default=func.now(),
         onupdate=func.now(),
     )
+    sales: Mapped[list["Sale"]] = relationship(back_populates="seller")
+
+
+import app.models.sale  # noqa: E402, F401

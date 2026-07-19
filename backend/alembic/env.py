@@ -10,6 +10,7 @@ from app.database.base import Base
 import app.models.user  # noqa: F401
 import app.models.vehicle  # noqa: F401
 import app.models.purchase  # noqa: F401
+import app.models.sale  # noqa: F401
 
 
 config = context.config

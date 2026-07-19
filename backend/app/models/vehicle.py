@@ -119,6 +119,11 @@ class Vehicle(Base):
         back_populates="vehicle",
         uselist=False,
     )
+    sale: Mapped["Sale | None"] = relationship(
+        back_populates="vehicle",
+        uselist=False,
+    )
 
 
 import app.models.purchase  # noqa: E402, F401
+import app.models.sale  # noqa: E402, F401
