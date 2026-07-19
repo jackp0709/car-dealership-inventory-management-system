@@ -1,5 +1,5 @@
 import { Alert, Box, CircularProgress } from '@mui/material'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 
 import { apiClient } from '../api/client'
@@ -12,8 +12,12 @@ function VehicleEditPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [vehicle, setVehicle] = useState(null)
+  const hasLoadedVehicle = useRef(false)
 
   useEffect(() => {
+    if (hasLoadedVehicle.current) return
+    hasLoadedVehicle.current = true
+
     const loadVehicle = async () => {
       try {
         const response = await apiClient.get(`/vehicles/${vehicleId}`)

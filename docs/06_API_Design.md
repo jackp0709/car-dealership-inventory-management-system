@@ -407,11 +407,12 @@ Accept: application/json
 
 ## Success Response
 
+Current Version 1 endpoints return the response model directly. For example, vehicle endpoints return the vehicle representation and the login endpoint returns the token representation.
+
 ```json
 {
-    "success": true,
-    "message": "Vehicle created successfully.",
-    "data": {}
+    "id": 1,
+    "manufacturer": "Example Manufacturer"
 }
 ```
 
@@ -431,10 +432,9 @@ Accept: application/json
 
 ## Final Decisions
 
-- Every API follows a common response structure.
-- Success responses include `success`, `message`, and `data`.
-- Error responses include `success`, `message`, and `errors`.
-- Response structure should remain consistent across all endpoints.
+- Success responses follow their declared response model.
+- Error responses use the project's standard `success`, `message`, and `errors` structure.
+- Response models remain consistent within each endpoint type.
 
 ---
 
@@ -588,18 +588,8 @@ POST /api/v1/auth/login
 
 ```json
 {
-    "success": true,
-    "message": "Login successful.",
-    "data": {
-        "access_token": "<JWT_TOKEN>",
-        "token_type": "Bearer",
-        "user": {
-            "id": 1,
-            "full_name": "John Doe",
-            "email": "john@example.com",
-            "role": "ADMIN"
-        }
-    }
+    "access_token": "<JWT_TOKEN>",
+    "token_type": "bearer"
 }
 ```
 
@@ -608,9 +598,7 @@ POST /api/v1/auth/login
 ## Final Decisions
 
 - Login returns JWT.
-- Login also returns authenticated user information.
 - Password is never returned.
-- Only active users can log in.
 
 ---
 
@@ -636,8 +624,6 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```
 sub
-email
-role
 exp
 ```
 
@@ -660,14 +646,6 @@ exp
 ---
 
 # 4.4 Logout
-
-## Endpoint
-
-```
-POST /api/v1/auth/logout
-```
-
----
 
 ## Final Decisions
 
@@ -775,7 +753,6 @@ This section provides a high-level overview of all API endpoints grouped by modu
 | Method | Endpoint | Access | Purpose |
 |---------|----------|--------|---------|
 | POST | /auth/login | Public | Authenticate user |
-| POST | /auth/logout | Authenticated | Logout user |
 
 ---
 

@@ -50,46 +50,46 @@ function VehicleForm({ error, initialVehicle, isEditing, isSubmitting, onCancel,
         </Typography>
       )}
       <Grid container spacing={2}>
-        <Grid item size={{ xs: 12, sm: 6 }}>
+        <Grid size={{ xs: 12, sm: 6 }}>
           <TextField defaultValue={fields.manufacturer} fullWidth label="Manufacturer" name="manufacturer" required />
         </Grid>
-        <Grid item size={{ xs: 12, sm: 6 }}>
+        <Grid size={{ xs: 12, sm: 6 }}>
           <TextField defaultValue={fields.model} fullWidth label="Model" name="model" required />
         </Grid>
-        <Grid item size={{ xs: 12, sm: 6 }}>
+        <Grid size={{ xs: 12, sm: 6 }}>
           <TextField defaultValue={fields.vin} disabled={isEditing} fullWidth label="VIN" name="vin" required={!isEditing} />
         </Grid>
-        <Grid item size={{ xs: 12, sm: 6 }}>
+        <Grid size={{ xs: 12, sm: 6 }}>
           <TextField defaultValue={fields.year} fullWidth label="Year" name="year" required type="number" />
         </Grid>
-        <Grid item size={{ xs: 12, sm: 6 }}>
+        <Grid size={{ xs: 12, sm: 6 }}>
           <TextField defaultValue={fields.purchase_price} fullWidth label="Purchase Price" name="purchase_price" required type="number" />
         </Grid>
-        <Grid item size={{ xs: 12, sm: 6 }}>
+        <Grid size={{ xs: 12, sm: 6 }}>
           <TextField defaultValue={fields.selling_price} fullWidth label="Selling Price" name="selling_price" required type="number" />
         </Grid>
-        <Grid item size={{ xs: 12, sm: 6 }}>
+        <Grid size={{ xs: 12, sm: 6 }}>
           <TextField defaultValue={fields.color} fullWidth label="Color" name="color" required />
         </Grid>
-        <Grid item size={{ xs: 12, sm: 6 }}>
+        <Grid size={{ xs: 12, sm: 6 }}>
           <TextField defaultValue={fields.mileage} fullWidth label="Mileage" name="mileage" required type="number" />
         </Grid>
-        <Grid item size={{ xs: 12, sm: 4 }}>
+        <Grid size={{ xs: 12, sm: 4 }}>
           <TextField defaultValue={fields.fuel_type} fullWidth label="Fuel Type" name="fuel_type" select>
             {fuelTypes.map((fuelType) => <MenuItem key={fuelType} value={fuelType}>{fuelType}</MenuItem>)}
           </TextField>
         </Grid>
-        <Grid item size={{ xs: 12, sm: 4 }}>
+        <Grid size={{ xs: 12, sm: 4 }}>
           <TextField defaultValue={fields.transmission} fullWidth label="Transmission" name="transmission" select>
             {transmissions.map((transmission) => <MenuItem key={transmission} value={transmission}>{transmission}</MenuItem>)}
           </TextField>
         </Grid>
-        <Grid item size={{ xs: 12, sm: 4 }}>
+        <Grid size={{ xs: 12, sm: 4 }}>
           <TextField defaultValue={fields.condition} fullWidth label="Condition" name="condition" select>
             {conditions.map((condition) => <MenuItem key={condition} value={condition}>{condition}</MenuItem>)}
           </TextField>
         </Grid>
-        <Grid item size={12}>
+        <Grid size={12}>
           <TextField defaultValue={fields.description ?? ''} fullWidth label="Description" minRows={3} multiline name="description" />
         </Grid>
       </Grid>

@@ -1,7 +1,14 @@
 import { AppBar, Box, Button, Container, Toolbar, Typography } from '@mui/material'
-import { Link as RouterLink, Outlet } from 'react-router-dom'
+import { Link as RouterLink, Outlet, useNavigate } from 'react-router-dom'
 
 function App() {
+  const navigate = useNavigate()
+
+  const handleLogout = () => {
+    localStorage.removeItem('access_token')
+    navigate('/login')
+  }
+
   return (
     <Box sx={{ minHeight: '100vh', bgcolor: 'grey.50' }}>
       <AppBar position="sticky" elevation={1}>
@@ -11,6 +18,9 @@ function App() {
           </Typography>
           <Button color="inherit" component={RouterLink} to="/vehicles">
             Vehicles
+          </Button>
+          <Button color="inherit" onClick={handleLogout}>
+            Logout
           </Button>
         </Toolbar>
       </AppBar>

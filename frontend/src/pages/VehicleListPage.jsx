@@ -20,7 +20,7 @@ import {
   TableRow,
   Typography,
 } from '@mui/material'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link as RouterLink, useLocation } from 'react-router-dom'
 
 import { apiClient } from '../api/client'
@@ -49,6 +49,7 @@ function VehicleListPage() {
   const [error, setError] = useState('')
   const [isDeleting, setIsDeleting] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
+  const hasLoadedVehicles = useRef(false)
   const [selectedVehicle, setSelectedVehicle] = useState(null)
   const [successMessage, setSuccessMessage] = useState(location.state?.successMessage ?? '')
 
@@ -71,6 +72,8 @@ function VehicleListPage() {
   }
 
   useEffect(() => {
+    if (hasLoadedVehicles.current) return
+    hasLoadedVehicles.current = true
     loadVehicles()
   }, [])
 
