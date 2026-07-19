@@ -158,3 +158,45 @@ OpenAI Codex was used as a development assistant to review repository structure,
 ## License
 
 No license has been selected for this repository.
+
+## Application Screenshots
+
+### Login
+
+![Login](docs/images/image.png)
+
+### Dashboard
+
+![Dashboard](docs/images/image-1.png)
+
+### Vehicle Management
+
+![Vehicles](docs/images/image-2.png)
+
+### Add Vehicle
+
+![Add Vehicle](docs/images/image-4.png)
+
+### Purchase Management
+
+![Purchases](docs/images/image-3.png)
+
+### Add Purchase
+
+![Add Purchase](docs/images/image-5.png)
+
+### Sales Management
+
+![Sales](docs/images/image-6.png)
+
+### Add Sale
+
+![Add Sale](docs/images/image-7.png)
+
+### API Documentation (Swagger)
+
+![Swagger Login](docs/images/image-8.png)
+
+![Swagger Vehicles](docs/images/image-9.png)
+
+![Swagger Sales](docs/images/image-10.png)
